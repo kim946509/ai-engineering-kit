@@ -1,0 +1,37 @@
+{
+  "name": "ai-engineering-kit",
+  "version": "0.1.0",
+  "description": "Reusable AI engineering environments, skills, harnesses, loops, and graph-oriented workflows.",
+  "author": {
+    "name": "kim946509",
+    "url": "https://github.com/kim946509"
+  },
+  "homepage": "https://github.com/kim946509/ai-engineering-kit",
+  "repository": "https://github.com/kim946509/ai-engineering-kit",
+  "license": "MIT",
+  "keywords": [
+    "ai-engineering",
+    "codex",
+    "skills",
+    "harness",
+    "graph-engineering"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Engineering Kit",
+    "shortDescription": "Reusable AI development environments and skills.",
+    "longDescription": "A growing collection of project-local AI development environments, skills, harness contracts, feedback loops, and graph-oriented workflows.",
+    "developerName": "kim946509",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Skills",
+      "Project setup",
+      "Documentation"
+    ],
+    "defaultPrompt": [
+      "Set up a project-local AI development environment.",
+      "Audit this repository's AI engineering setup.",
+      "Document the harness, loops, and work graph."
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project AI Bootstrap"
+  short_description: "Set up a portable project-local AI environment"
+  default_prompt: "Use $project-ai-bootstrap to initialize or audit a portable project-local AI development environment."

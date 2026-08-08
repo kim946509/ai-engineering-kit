@@ -1,0 +1,43 @@
+version: 1
+profile: generic-software-project
+
+entrypoints:
+  agent_rules: AGENTS.md
+  shared_language: CONTEXT.md
+  environment_guide: docs/AI_ENVIRONMENT.md
+  work_graph: .ai/GRAPHS.md
+  loop_catalog: .ai/LOOPS.md
+
+local_skills:
+  root: .agents/skills
+  lock: .ai/skills.lock.json
+
+anchors:
+  frozen:
+    - user_explicit_decisions
+    - product_scope
+    - security_and_privacy_rules
+    - acceptance_criteria
+    - held_out_evaluations
+  human_approval_required:
+    - production_deployment
+    - external_side_effects
+    - destructive_operations
+    - costs
+    - secrets_or_credentials
+    - harness_anchor_changes
+
+work_item:
+  states: [proposed, ready, active, verify, blocked, done, rejected]
+  template: .ai/templates/work-item.md
+
+verification:
+  source_of_commands: AGENTS.md
+  evidence_required: true
+  model_self_judgment_is_sufficient: false
+
+improvement:
+  minimum_repeated_failures: 3
+  max_changes_per_iteration: 1
+  rollback_required: true
+  human_approval_required: true
