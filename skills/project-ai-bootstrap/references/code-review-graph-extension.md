@@ -1,8 +1,8 @@
-# Code Review Graph Profile
+# Code Review Graph Extension
 
-Code Review Graph를 코드 리뷰 루프의 관찰자로 연결하고, 저장소에서 새로 확인된 운영 지식을 `AGENTS.md`에 주기적으로 반영하는 선택적 프로필입니다.
+Code Review Graph를 코드 리뷰 루프의 관찰자로 연결하고, 저장소에서 새로 확인된 운영 지식을 `AGENTS.md`에 주기적으로 반영하는 선택적 extension입니다.
 
-이 프로필은 두 개의 서로 다른 피드백 루프를 묶습니다.
+이 extension은 두 개의 서로 다른 피드백 루프를 묶습니다.
 
 ```mermaid
 flowchart LR
@@ -23,7 +23,7 @@ flowchart LR
 - Start graph-assisted work with minimal context and request deeper analysis only when needed.
 - Treat graph output as review evidence, not as a replacement for source inspection, tests, builds, or the original specification.
 
-The Codex hook template is at `codex/hooks.json`. It matches the currently exercised pattern:
+The Codex hook template is at `assets/extensions/code-review-graph/codex/hooks.json`. It matches the currently exercised pattern:
 
 - `PostToolUse(Write|Edit|Bash)` → `code-review-graph update --skip-flows`
 - `SessionStart(startup|resume)` → `code-review-graph status`
@@ -32,7 +32,7 @@ Officially supported alternatives are a long-running `code-review-graph watch` p
 
 ## Loop 2: AGENTS.md maintenance
 
-The Codex automation template at `codex/automations/update-agents-md.template.toml` runs weekly and asks an isolated worktree task to update only repository-backed workflows and commands.
+The Codex automation template at `assets/extensions/code-review-graph/codex/automations/update-agents-md.template.toml` runs weekly and asks an isolated worktree task to update only repository-backed workflows and commands.
 
 Guardrails:
 
@@ -55,8 +55,8 @@ This is a documentation-governance loop, not a Code Review Graph feature. Its sl
    ```
 
 2. Add `.code-review-graph/` to the target repository's ignore file.
-3. Merge `templates/AGENTS.snippet.md` into the target project rules.
-4. For Codex, merge `codex/hooks.json` with existing hooks; do not overwrite unrelated hooks.
+3. Merge `assets/extensions/code-review-graph/templates/AGENTS.snippet.md` into the target project rules.
+4. For Codex, merge `assets/extensions/code-review-graph/codex/hooks.json` with existing hooks; do not overwrite unrelated hooks.
 5. Create the weekly automation using the Codex automation UI/tool and the values in the TOML template. Replace all placeholders with the real target project, root, and available model.
 6. Verify graph status, perform one code change, and confirm an incremental update succeeds.
 

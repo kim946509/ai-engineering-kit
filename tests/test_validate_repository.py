@@ -48,17 +48,43 @@ class RepositoryValidationTests(unittest.TestCase):
             errors,
         )
 
-    def test_catalog_profile_path_must_exist(self):
+    def test_skill_requires_matching_example_folder(self):
         validator = load_validator()
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "catalog.json").write_text(
+            skill = root / "skills" / "sample-skill"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text(
+                "---\nname: sample-skill\ndescription: test\n---\n",
+                encoding="utf-8",
+            )
+            errors = []
+
+            validator.validate_examples(root, errors)
+
+        self.assertIn(
+            "missing matching example folder for skill: sample-skill",
+            errors,
+        )
+
+    def test_preset_skill_names_must_be_unique(self):
+        validator = load_validator()
+
+        with tempfile.TemporaryDirectory() as directory:
+            preset = Path(directory) / "preset.json"
+            preset.write_text(
                 json.dumps(
                     {
-                        "skills": [],
-                        "profiles": [
-                            {"name": "missing-profile", "path": "profiles/missing"}
+                        "name": "test",
+                        "source": {
+                            "repository": "https://example.com/skills",
+                            "ref": "abc123",
+                        },
+                        "install_root": ".agents/skills",
+                        "skills": [
+                            {"name": "duplicate", "path": "skills/a", "loops": ["a"]},
+                            {"name": "duplicate", "path": "skills/b", "loops": ["b"]},
                         ],
                     }
                 ),
@@ -66,10 +92,10 @@ class RepositoryValidationTests(unittest.TestCase):
             )
             errors = []
 
-            validator.validate_catalog(root, errors)
+            validator.validate_preset(preset, errors)
 
         self.assertIn(
-            "catalog profile path does not exist: profiles/missing",
+            f"preset contains duplicate skill name 'duplicate': {preset}",
             errors,
         )
 

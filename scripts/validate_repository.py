@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -13,19 +12,19 @@ REQUIRED_PATHS = (
     "README.md",
     "LICENSE",
     "AGENTS.md",
-    "catalog.json",
-    ".codex-plugin/plugin.json",
     "skills/project-ai-bootstrap/SKILL.md",
     "skills/project-ai-bootstrap/references/bootstrap-contract.md",
+    "skills/project-ai-bootstrap/references/code-review-graph-extension.md",
     "skills/project-ai-bootstrap/assets/core/.ai/harness.yaml",
-    "docs/architecture.md",
-    "docs/compatibility.md",
-    "profiles/README.md",
-    "profiles/code-review-graph/README.md",
-    "profiles/code-review-graph/profile.json",
-    "profiles/code-review-graph/codex/hooks.json",
-    "profiles/code-review-graph/codex/automations/update-agents-md.template.toml",
-    "profiles/code-review-graph/templates/AGENTS.snippet.md",
+    "skills/project-ai-bootstrap/assets/presets/generic-engineering-skills.json",
+    "skills/project-ai-bootstrap/assets/extensions/code-review-graph/extension.json",
+    "skills/project-ai-bootstrap/assets/extensions/code-review-graph/codex/hooks.json",
+    "skills/project-ai-bootstrap/assets/extensions/code-review-graph/codex/automations/update-agents-md.template.toml",
+    "skills/project-ai-bootstrap/assets/extensions/code-review-graph/templates/AGENTS.snippet.md",
+    "examples/project-ai-bootstrap/README.md",
+    "examples/project-ai-bootstrap/project-structure.md",
+    "examples/project-ai-bootstrap/installed-skills.md",
+    "examples/project-ai-bootstrap/usage.md",
 )
 
 FORBIDDEN_PORTABLE_TEXT = (
@@ -83,44 +82,54 @@ def validate_skill(skill_dir: Path) -> list[str]:
     return errors
 
 
-def validate_plugin(root: Path, errors: list[str]) -> None:
-    path = root / ".codex-plugin" / "plugin.json"
-    if not path.is_file():
+def validate_examples(root: Path, errors: list[str]) -> None:
+    skills_root = root / "skills"
+    examples_root = root / "examples"
+    if not skills_root.is_dir():
         return
 
-    plugin = load_json(path, errors)
-    if plugin.get("name") != root.name:
-        errors.append("plugin name must match the repository folder name")
-    if not re.fullmatch(r"\d+\.\d+\.\d+", str(plugin.get("version", ""))):
-        errors.append("plugin version must use strict semantic versioning")
-    if plugin.get("skills") != "./skills/":
-        errors.append("plugin skills path must be './skills/'")
-
-    prompts = plugin.get("interface", {}).get("defaultPrompt", [])
-    if not isinstance(prompts, list) or not 1 <= len(prompts) <= 3:
-        errors.append("plugin defaultPrompt must contain one to three prompts")
-    elif any(not isinstance(prompt, str) or len(prompt) > 128 for prompt in prompts):
-        errors.append("plugin prompts must be strings of at most 128 characters")
+    for skill_dir in sorted(path for path in skills_root.iterdir() if path.is_dir()):
+        if not (examples_root / skill_dir.name).is_dir():
+            errors.append(f"missing matching example folder for skill: {skill_dir.name}")
 
 
-def validate_catalog(root: Path, errors: list[str]) -> None:
-    path = root / "catalog.json"
-    if not path.is_file():
+def validate_preset(path: Path, errors: list[str]) -> None:
+    preset = load_json(path, errors)
+    if not preset:
         return
 
-    catalog = load_json(path, errors)
-    for component in catalog.get("skills", []):
-        relative_path = component.get("path")
-        if not relative_path or not (root / relative_path).is_dir():
-            errors.append(f"catalog skill path does not exist: {relative_path}")
-    for component in catalog.get("profiles", []):
-        relative_path = component.get("path")
-        if relative_path and not (root / relative_path).is_dir():
-            errors.append(f"catalog profile path does not exist: {relative_path}")
+    source = preset.get("source")
+    if not isinstance(source, dict) or not source.get("repository") or not source.get("ref"):
+        errors.append(f"preset source must include repository and ref: {path}")
+    if preset.get("install_root") != ".agents/skills":
+        errors.append(f"preset install_root must be '.agents/skills': {path}")
+
+    skills = preset.get("skills")
+    if not isinstance(skills, list) or not skills:
+        errors.append(f"preset must contain at least one skill: {path}")
+        return
+
+    seen: set[str] = set()
+    for index, skill in enumerate(skills):
+        if not isinstance(skill, dict):
+            errors.append(f"preset skill at index {index} must be an object: {path}")
+            continue
+        name = skill.get("name")
+        if not isinstance(name, str) or not name:
+            errors.append(f"preset skill at index {index} is missing a name: {path}")
+        elif name in seen:
+            errors.append(f"preset contains duplicate skill name '{name}': {path}")
+        else:
+            seen.add(name)
+        if not isinstance(skill.get("path"), str) or not skill["path"]:
+            errors.append(f"preset skill '{name}' is missing a path: {path}")
+        loops = skill.get("loops")
+        if not isinstance(loops, list) or not loops:
+            errors.append(f"preset skill '{name}' must map to at least one loop: {path}")
 
 
 def validate_portability(root: Path, errors: list[str]) -> None:
-    scan_roots = (root / "skills", root / "docs")
+    scan_roots = (root / "skills", root / "examples")
     for scan_root in scan_roots:
         if not scan_root.exists():
             continue
@@ -152,8 +161,11 @@ def validate_repository(root: Path) -> list[str]:
         for skill_dir in sorted(path for path in skills_root.iterdir() if path.is_dir()):
             errors.extend(validate_skill(skill_dir))
 
-    validate_plugin(root, errors)
-    validate_catalog(root, errors)
+    validate_examples(root, errors)
+    presets_root = root / "skills" / "project-ai-bootstrap" / "assets" / "presets"
+    if presets_root.is_dir():
+        for preset in sorted(presets_root.glob("*.json")):
+            validate_preset(preset, errors)
     validate_portability(root, errors)
     return errors
 

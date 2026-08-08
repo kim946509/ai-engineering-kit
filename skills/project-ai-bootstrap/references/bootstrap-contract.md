@@ -61,4 +61,4 @@ Each active loop declares trigger, goal, inputs, frozen anchors, actions or mapp
 - [ ] Fast loops cannot modify frozen anchors.
 - [ ] External side effects and deployment require human approval.
 - [ ] Harness changes use one-variable experiments and rollback.
-- [ ] Platform-specific profiles remain separate from the generic core.
+- [ ] Platform-specific extensions remain separate from the generic core.

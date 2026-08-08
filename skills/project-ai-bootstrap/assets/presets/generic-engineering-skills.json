@@ -1,0 +1,23 @@
+{
+  "name": "generic-engineering",
+  "version": 1,
+  "description": "Project-local engineering skills for planning, specification, implementation, testing, diagnosis, review, research, and integration.",
+  "source": {
+    "repository": "https://github.com/mattpocock/skills",
+    "ref": "84fdeffd12f2ee307994d1eb6feb48173b6e0502"
+  },
+  "install_root": ".agents/skills",
+  "skills": [
+    {"name": "grill-with-docs", "path": "skills/engineering/grill-with-docs", "loops": ["planning"]},
+    {"name": "domain-modeling", "path": "skills/engineering/domain-modeling", "loops": ["planning", "design"]},
+    {"name": "to-spec", "path": "skills/engineering/to-spec", "loops": ["specification"]},
+    {"name": "to-tickets", "path": "skills/engineering/to-tickets", "loops": ["task-graph"]},
+    {"name": "implement", "path": "skills/engineering/implement", "loops": ["implementation"]},
+    {"name": "tdd", "path": "skills/engineering/tdd", "loops": ["implementation", "bug-fix"]},
+    {"name": "diagnosing-bugs", "path": "skills/engineering/diagnosing-bugs", "loops": ["diagnosis"]},
+    {"name": "codebase-design", "path": "skills/engineering/codebase-design", "loops": ["design", "refactoring"]},
+    {"name": "code-review", "path": "skills/engineering/code-review", "loops": ["review"]},
+    {"name": "research", "path": "skills/engineering/research", "loops": ["planning", "architecture", "documentation"]},
+    {"name": "resolving-merge-conflicts", "path": "skills/engineering/resolving-merge-conflicts", "loops": ["integration"]}
+  ]
+}

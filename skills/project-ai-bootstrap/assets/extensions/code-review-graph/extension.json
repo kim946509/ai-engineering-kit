@@ -1,5 +1,6 @@
 {
   "name": "code-review-graph",
+  "type": "project-ai-bootstrap-extension",
   "version": 1,
   "status": "experimental",
   "summary": "Keep a local code graph fresh and maintain repository-backed AGENTS.md guidance on a slower schedule.",

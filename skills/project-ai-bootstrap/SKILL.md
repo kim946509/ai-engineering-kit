@@ -1,6 +1,6 @@
 ---
 name: project-ai-bootstrap
-description: Initialize, migrate, audit, extend, or document a portable project-local AI development environment. Use when starting AI-assisted development in a repository, replacing an ad-hoc harness, installing project-local skills, defining planning/development/test/review/release loops, designing work and improvement graphs, or adding a platform-specific profile after the generic core is stable.
+description: Initialize, migrate, audit, extend, or document a portable project-local AI development environment. Use when starting AI-assisted development in a repository, replacing an ad-hoc harness, installing project-local skills, defining planning/development/test/review/release loops, designing work and improvement graphs, or adding a platform-specific extension after the generic core is stable.
 ---
 
 # Project AI Bootstrap
@@ -11,6 +11,8 @@ Build the smallest reliable project-local AI environment. Keep product truth, ag
 
 - Read `references/bootstrap-contract.md` completely before changing a target repository.
 - Use `assets/core/` as the canonical generic template when initializing or migrating.
+- For a complete generic engineering setup, read `assets/presets/generic-engineering-skills.json` and install non-duplicated skills into the target project.
+- When explicitly extending with Code Review Graph, read `references/code-review-graph-extension.md` and use `assets/extensions/code-review-graph/`.
 - Adapt every `{{PLACEHOLDER}}` to the target repository. Never leave placeholders or invent build, test, lint, format, or deployment commands.
 
 ## Workflow
@@ -24,7 +26,7 @@ Build the smallest reliable project-local AI environment. Keep product truth, ag
    - `initialize`: create a generic core where none exists.
    - `migrate`: replace an existing harness while preserving product truth and user changes.
    - `audit`: report gaps without modifying files.
-   - `extend`: add one platform or tool profile after the core is stable.
+   - `extend`: add one platform or tool extension after the core is stable.
 
 3. Create or repair the required surfaces.
    - Copy and adapt only the files needed from `assets/core/`.
@@ -34,6 +36,7 @@ Build the smallest reliable project-local AI environment. Keep product truth, ag
    - Keep provider-specific manifests separate from the portable core.
 
 4. Install only skills mapped to active loops.
+   - For `initialize` with a complete generic engineering setup, use the bundled generic engineering preset unless the target already has equivalent skills or the user requests a smaller setup.
    - Prefer project-local installation.
    - Record source repository, immutable ref, path, normalization, and local SHA-256 values in `.ai/skills.lock.json`.
    - Do not install globally unless explicitly requested.
@@ -48,7 +51,7 @@ Build the smallest reliable project-local AI environment. Keep product truth, ag
    - Check required files, links, skill metadata, provenance, and hashes.
    - Confirm fast loops cannot rewrite frozen product, security, acceptance, or evaluation anchors.
    - Confirm improvement experiments change one element at a time and can roll back.
-   - Report platform-specific work deferred because code, tooling, or a profile does not exist yet.
+   - Report platform-specific work deferred because code, tooling, or an extension does not exist yet.
 
 ## Boundaries
 
