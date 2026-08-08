@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -44,6 +45,31 @@ class RepositoryValidationTests(unittest.TestCase):
 
         self.assertIn(
             "skill folder 'sample-skill' does not match frontmatter name 'different-name'",
+            errors,
+        )
+
+    def test_catalog_profile_path_must_exist(self):
+        validator = load_validator()
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "catalog.json").write_text(
+                json.dumps(
+                    {
+                        "skills": [],
+                        "profiles": [
+                            {"name": "missing-profile", "path": "profiles/missing"}
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            errors = []
+
+            validator.validate_catalog(root, errors)
+
+        self.assertIn(
+            "catalog profile path does not exist: profiles/missing",
             errors,
         )
 

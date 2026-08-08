@@ -1,0 +1,12 @@
+version = 1
+id = "update-agents-md"
+kind = "cron"
+name = "Update AGENTS.md"
+prompt = "Update AGENTS.md with newly discovered, repository-backed workflows and commands. Keep changes minimal and accurate. Do not touch unrelated sections or generated files. Do not invent commands; add a short TODO when evidence is insufficient. Do not commit or push automatically."
+status = "ACTIVE"
+rrule = "RRULE:FREQ=WEEKLY;BYHOUR=0;BYMINUTE=0;BYDAY=MO"
+model = "{{AVAILABLE_MODEL}}"
+reasoning_effort = "high"
+execution_environment = "worktree"
+target = { type = "project", project_id = "{{CODEX_PROJECT_ID}}" }
+cwds = ["{{PROJECT_ROOT}}"]

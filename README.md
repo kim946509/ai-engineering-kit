@@ -13,6 +13,7 @@
 | `project-ai-bootstrap` | 사용 가능 | 프로젝트 로컬 AI 개발 환경을 초기화·마이그레이션·감사·확장 |
 | Generic Core Blueprint | 사용 가능 | 에이전트 규칙, 상태, 루프, 작업/개선 그래프, 증거 템플릿 |
 | Codex plugin manifest | 사용 가능 | 저장소의 스킬을 Codex 플러그인으로 노출 |
+| Code Review Graph profile | 실험적 | 변경 후 graph update와 주기적 `AGENTS.md` 유지보수 루프 |
 | iOS profile | 예정 | SwiftUI, Xcode, Simulator, 성능·메모리·릴리스 루프 |
 | Claude Code adapter | 예정 | 공통 스킬을 Claude Code에서 배포·호출하는 어댑터 |
 | Cursor adapter | 예정 | 공통 스킬을 Cursor에서 배포·호출하는 어댑터 |
@@ -47,6 +48,7 @@ ai-engineering-kit/
 │       ├── references/
 │       └── assets/core/        # 생성할 프로젝트 환경의 원본
 ├── profiles/                   # iOS 같은 선택적 환경 확장 계약
+│   └── code-review-graph/      # 그래프 갱신 및 AGENTS.md 유지보수 루프
 ├── catalog.json                # 공개 구성요소와 지원 상태
 ├── docs/                       # 저장소 아키텍처와 호환성 정책
 ├── scripts/                    # 저장소 자체의 결정론적 검증
@@ -68,6 +70,8 @@ ai-engineering-kit/
 ## 확장 방향
 
 새 스킬은 `skills/<skill-name>/`에 독립 패키지로 추가합니다. 특정 개발 환경은 `profiles/`의 계약과 필요한 스킬 조합으로 추가합니다. 외부 스킬은 무단 복제하지 않고 출처, 고정 ref, 경로, 라이선스를 기록한 manifest로 연결하는 것을 우선합니다.
+
+현재 사용 중인 Code Review Graph 자동 갱신과 주간 `AGENTS.md` 유지보수 방식은 [Code Review Graph 프로필](profiles/code-review-graph/README.md)에 재사용 가능한 템플릿으로 정리했습니다.
 
 자세한 내용은 [아키텍처](docs/architecture.md), [호환성 정책](docs/compatibility.md), [기여 가이드](CONTRIBUTING.md)를 참고하세요.
 

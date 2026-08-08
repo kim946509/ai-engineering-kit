@@ -20,6 +20,11 @@
       "status": "stable"
     },
     {
+      "name": "code-review-graph",
+      "path": "profiles/code-review-graph",
+      "status": "experimental"
+    },
+    {
       "name": "ios-app-development",
       "status": "planned"
     }

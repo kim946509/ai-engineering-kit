@@ -21,6 +21,11 @@ REQUIRED_PATHS = (
     "docs/architecture.md",
     "docs/compatibility.md",
     "profiles/README.md",
+    "profiles/code-review-graph/README.md",
+    "profiles/code-review-graph/profile.json",
+    "profiles/code-review-graph/codex/hooks.json",
+    "profiles/code-review-graph/codex/automations/update-agents-md.template.toml",
+    "profiles/code-review-graph/templates/AGENTS.snippet.md",
 )
 
 FORBIDDEN_PORTABLE_TEXT = (
@@ -108,6 +113,10 @@ def validate_catalog(root: Path, errors: list[str]) -> None:
         relative_path = component.get("path")
         if not relative_path or not (root / relative_path).is_dir():
             errors.append(f"catalog skill path does not exist: {relative_path}")
+    for component in catalog.get("profiles", []):
+        relative_path = component.get("path")
+        if relative_path and not (root / relative_path).is_dir():
+            errors.append(f"catalog profile path does not exist: {relative_path}")
 
 
 def validate_portability(root: Path, errors: list[str]) -> None:
@@ -116,7 +125,13 @@ def validate_portability(root: Path, errors: list[str]) -> None:
         if not scan_root.exists():
             continue
         for path in scan_root.rglob("*"):
-            if not path.is_file() or path.suffix not in {".md", ".yaml", ".yml", ".json"}:
+            if not path.is_file() or path.suffix not in {
+                ".md",
+                ".yaml",
+                ".yml",
+                ".json",
+                ".toml",
+            }:
                 continue
             text = path.read_text(encoding="utf-8")
             for forbidden in FORBIDDEN_PORTABLE_TEXT:

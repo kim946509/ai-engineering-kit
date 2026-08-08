@@ -12,3 +12,7 @@
 - 실제 검증 명령과 증거 형식
 - 사람 승인이 필요한 외부 작업
 - 제거 또는 롤백 방법
+
+## Available profiles
+
+- [`code-review-graph`](code-review-graph/README.md): 변경 후 로컬 코드 그래프를 갱신하고, 더 느린 주기로 `AGENTS.md`의 저장소 운영 지식을 유지한다. 현재 Codex 구성이 실험적으로 제공된다.

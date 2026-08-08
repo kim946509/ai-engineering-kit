@@ -52,7 +52,8 @@ Every active loop declares `trigger → goal → inputs → actions → verifica
 - Goal: independently inspect specification fidelity and engineering quality
 - Inputs: fixed comparison point, original specification, repository rules
 - Skills: {{REVIEW_SKILLS}}
-- Actions: inspect diff → review specification → review quality → inspect impact and test gaps → reverify fixes
+- Optional observers: {{CODE_GRAPH_OBSERVERS}}
+- Actions: refresh observers when configured → inspect diff → review specification → review quality → inspect impact and test gaps → reverify fixes
 - Verification: actionable findings resolved or rejected with evidence
 - Stop: no unresolved material finding
 - Memory: review result and work item
