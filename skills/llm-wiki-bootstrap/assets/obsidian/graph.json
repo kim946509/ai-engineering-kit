@@ -1,0 +1,23 @@
+{
+  "collapse-filter": false,
+  "search": "path:docs/wiki -path:docs/wiki/generated -path:docs/wiki/tests -path:docs/wiki/tools",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": false,
+  "colorGroups": [
+    {
+      "query": "[authority:canonical]",
+      "color": { "a": 1, "rgb": 5025616 }
+    },
+    {
+      "query": "[authority:derived]",
+      "color": { "a": 1, "rgb": 3447003 }
+    },
+    {
+      "query": "[status:conflicted]",
+      "color": { "a": 1, "rgb": 15158332 }
+    }
+  ],
+  "showArrow": false
+}

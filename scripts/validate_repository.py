@@ -25,12 +25,32 @@ REQUIRED_PATHS = (
     "examples/project-ai-bootstrap/project-structure.md",
     "examples/project-ai-bootstrap/installed-skills.md",
     "examples/project-ai-bootstrap/usage.md",
+    "skills/llm-wiki-bootstrap/SKILL.md",
+    "skills/llm-wiki-bootstrap/agents/openai.yaml",
+    "skills/llm-wiki-bootstrap/references/wiki-contract.md",
+    "skills/llm-wiki-bootstrap/references/migration-and-safety.md",
+    "skills/llm-wiki-bootstrap/references/provider-adapters.md",
+    "skills/llm-wiki-bootstrap/scripts/bootstrap_wiki.py",
+    "skills/llm-wiki-bootstrap/assets/core/docs/wiki/tools/wiki.mjs",
+    "skills/llm-wiki-bootstrap/assets/core/docs/wiki/tests/wiki.test.mjs",
+    "skills/llm-wiki-bootstrap/assets/runtime-skill/project-llm-wiki/SKILL.md",
+    "skills/llm-wiki-bootstrap/assets/runtime-skill/project-llm-wiki/agents/openai.yaml",
+    "skills/llm-wiki-bootstrap/assets/obsidian/app.json",
+    "skills/llm-wiki-bootstrap/assets/obsidian/graph.json",
+    "examples/llm-wiki-bootstrap/README.md",
+    "examples/llm-wiki-bootstrap/project-structure.md",
+    "examples/llm-wiki-bootstrap/usage.md",
+    "examples/llm-wiki-bootstrap/safety-and-privacy.md",
 )
 
 FORBIDDEN_PORTABLE_TEXT = (
     "Money Snap",
     "moneysnap",
     "C:\\Users\\",
+    "C:\\source\\",
+    "bom_dbio",
+    "BOM DBIO",
+    "NB-26020612",
 )
 
 
