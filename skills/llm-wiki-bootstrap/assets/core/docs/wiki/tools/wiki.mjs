@@ -314,7 +314,189 @@ async function createResolutionIndex(options, wikiNotes) {
 
 function linkCandidates(target, fromNote, options) {
   const cleaned = toPosix(target.trim()).replace(/^\.\//, '');
-  const candidates = new Set([cleaned, stripMarkdownExtension(cl…1516 tokens truncated…eturn lines.join('\n');
+  const candidates = new Set([cleaned, stripMarkdownExtension(cleaned)]);
+  if (fromNote && (target.startsWith('.') || target.includes('/'))) {
+    const relativeAbsolute = path.resolve(path.dirname(fromNote.absolutePath), target);
+    if (isInside(options.vaultRoot, relativeAbsolute)) {
+      const relative = toPosix(path.relative(options.vaultRoot, relativeAbsolute));
+      candidates.add(relative);
+      candidates.add(stripMarkdownExtension(relative));
+    }
+  }
+  return [...candidates];
+}
+
+function resolveWikiLink(target, fromNote, index, options) {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target)) return { external: true, matches: [] };
+  for (const candidate of linkCandidates(target, fromNote, options)) {
+    const matches = index.get(normalized(candidate));
+    if (matches?.length) return { external: false, matches };
+  }
+  return { external: false, matches: [] };
+}
+
+function unwrapSourceRef(reference) {
+  const wikiLink = reference.match(/^!?\[\[([^\]]+)\]\]$/);
+  const target = wikiLink ? wikiLink[1].split('|', 1)[0] : reference;
+  return target.split('#', 1)[0].trim();
+}
+
+async function resolveSourceRef(reference, fromNote, index, options) {
+  const target = unwrapSourceRef(reference);
+  if (/^https?:\/\//i.test(target)) return { external: true, reference, target };
+
+  const wikiResolution = resolveWikiLink(target, fromNote, index, options);
+  if (wikiResolution.matches.length === 1) {
+    const note = wikiResolution.matches[0];
+    return { absolutePath: note.absolutePath, external: false, path: note.vaultPath, reference, target };
+  }
+
+  const rawCandidates = [];
+  const targetPath = target.replaceAll('/', path.sep);
+  rawCandidates.push(path.resolve(options.vaultRoot, targetPath));
+  rawCandidates.push(path.resolve(path.dirname(fromNote.absolutePath), targetPath));
+  if (!path.extname(targetPath)) {
+    rawCandidates.push(path.resolve(options.vaultRoot, `${targetPath}.md`));
+    rawCandidates.push(path.resolve(path.dirname(fromNote.absolutePath), `${targetPath}.md`));
+  }
+
+  for (const candidate of rawCandidates) {
+    if (!isInside(options.vaultRoot, candidate)) continue;
+    try {
+      const info = await stat(candidate);
+      if (info.isFile() || info.isDirectory()) {
+        return {
+          absolutePath: candidate,
+          external: false,
+          kind: info.isDirectory() ? 'directory' : 'file',
+          path: toPosix(path.relative(options.vaultRoot, candidate)),
+          reference,
+          target,
+        };
+      }
+    } catch {
+      // Try the next deterministic candidate.
+    }
+  }
+  return { external: false, missing: true, reference, target };
+}
+
+async function existingFilesystemTarget(target, fromNote, options) {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target)) return false;
+  const targetPath = target.replaceAll('/', path.sep);
+  const candidates = [
+    path.resolve(path.dirname(fromNote.absolutePath), targetPath),
+    path.resolve(options.vaultRoot, targetPath.replace(/^[/\\]+/, '')),
+  ];
+  for (const candidate of candidates) {
+    if (!isInside(options.vaultRoot, candidate)) continue;
+    try {
+      const info = await stat(candidate);
+      if (info.isFile() || info.isDirectory()) return true;
+    } catch {
+      // Try the next deterministic candidate.
+    }
+  }
+  return false;
+}
+
+function isWritable(note) {
+  return note.authority === 'derived' && note.owner === 'llm';
+}
+
+function publicNote(note) {
+  return {
+    aliases: note.aliases,
+    authority: note.authority,
+    kind: note.kind,
+    owner: note.owner,
+    path: note.path,
+    source_refs: note.sourceRefs,
+    status: note.status,
+    summary: note.summary,
+    title: note.title,
+    topics: note.topics,
+    wiki_id: note.wikiId,
+    writable: isWritable(note),
+  };
+}
+
+function createCatalog(notes) {
+  return {
+    notes: notes.map(publicNote),
+    version: 1,
+  };
+}
+
+function createGraph(notes, index, options) {
+  const wikiByVaultPath = new Map(notes.map((note) => [note.vaultPath, note]));
+  const edges = [];
+  for (const note of notes) {
+    for (const target of note.links) {
+      const resolution = resolveWikiLink(target, note, index, options);
+      if (resolution.matches.length === 1) {
+        const resolved = resolution.matches[0];
+        edges.push({
+          from: note.wikiId ?? note.path,
+          from_path: note.path,
+          target,
+          to: wikiByVaultPath.get(resolved.vaultPath)?.wikiId ?? null,
+          to_path: resolved.vaultPath,
+        });
+      } else {
+        edges.push({
+          from: note.wikiId ?? note.path,
+          from_path: note.path,
+          target,
+          to: null,
+          to_path: null,
+        });
+      }
+    }
+  }
+  edges.sort((left, right) =>
+    `${left.from_path}\0${left.to_path ?? ''}\0${left.target}`.localeCompare(
+      `${right.from_path}\0${right.to_path ?? ''}\0${right.target}`,
+      'en',
+    ));
+  return {
+    edges,
+    nodes: notes.map((note) => ({
+      authority: note.authority,
+      path: note.path,
+      status: note.status,
+      title: note.title,
+      wiki_id: note.wikiId,
+    })),
+    version: 1,
+  };
+}
+
+function escapeTable(value) {
+  return String(value ?? '').replaceAll('|', '\\|').replaceAll('\n', ' ');
+}
+
+function renderIndex(notes) {
+  const lines = [
+    '---',
+    'wiki_generated: true',
+    '---',
+    '',
+    '# LLM Wiki Index',
+    '',
+    '> Generated by `node docs/wiki/tools/wiki.mjs build`. Do not edit by hand.',
+    '',
+    '| Note | Kind | Authority | Status | Owner |',
+    '|---|---|---|---|---|',
+  ];
+  const sorted = [...notes].sort((left, right) =>
+    left.title.localeCompare(right.title, 'ko') || left.path.localeCompare(right.path, 'en'));
+  for (const note of sorted) {
+    const target = stripMarkdownExtension(note.path);
+    lines.push(`| [[${target}|${escapeTable(note.title)}]] | ${escapeTable(note.kind)} | ${escapeTable(note.authority)} | ${escapeTable(note.status)} | ${escapeTable(note.owner)} |`);
+  }
+  lines.push('');
+  return lines.join('\n');
 }
 
 function stableJson(value) {
