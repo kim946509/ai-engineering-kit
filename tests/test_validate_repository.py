@@ -99,6 +99,28 @@ class RepositoryValidationTests(unittest.TestCase):
             errors,
         )
 
+    def test_portability_rejects_private_project_paths(self):
+        validator = load_validator()
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            skill = root / "skills" / "sample-skill"
+            skill.mkdir(parents=True)
+            path = skill / "SKILL.md"
+            path.write_text(
+                "---\nname: sample-skill\ndescription: test\n---\n"
+                "Read C:\\source\\private-project\\docs.\n",
+                encoding="utf-8",
+            )
+            errors = []
+
+            validator.validate_portability(root, errors)
+
+        self.assertTrue(
+            any("portable content contains" in error and "source" in error for error in errors),
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

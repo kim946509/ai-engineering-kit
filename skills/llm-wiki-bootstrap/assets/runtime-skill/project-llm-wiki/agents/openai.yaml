@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project LLM Wiki"
+  short_description: "Route and maintain source-backed project knowledge"
+  default_prompt: "Use $project-llm-wiki to route this request through the project Wiki and preserve any verified durable delta."

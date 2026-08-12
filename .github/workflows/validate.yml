@@ -15,5 +15,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - run: python -m unittest discover -s tests -v
       - run: python scripts/validate_repository.py
+      - run: node --check skills/llm-wiki-bootstrap/assets/core/docs/wiki/tools/wiki.mjs
+      - run: node --test skills/llm-wiki-bootstrap/assets/core/docs/wiki/tests/*.test.mjs

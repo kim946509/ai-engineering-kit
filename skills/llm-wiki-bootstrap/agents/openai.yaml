@@ -1,0 +1,4 @@
+interface:
+  display_name: "LLM Wiki Bootstrap"
+  short_description: "Build a governed, source-backed local LLM Wiki"
+  default_prompt: "Use $llm-wiki-bootstrap to initialize or audit a project-local LLM Wiki for Codex and Claude."

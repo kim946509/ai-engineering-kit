@@ -1,0 +1,9 @@
+{
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "docs/wiki/assets",
+  "newFileFolderPath": "docs/wiki",
+  "newFileLocation": "folder",
+  "showInlineTitle": true,
+  "showUnsupportedFiles": false,
+  "useMarkdownLinks": false
+}
